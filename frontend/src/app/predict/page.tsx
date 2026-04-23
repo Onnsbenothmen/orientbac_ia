@@ -213,7 +213,7 @@ export default function PredictPage() {
           setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 120);
         }
       } else {
-        const res = await api.recommend(score, section, 30);
+        const res = await api.recommend(score, section, 10);
         setRecommendations(res);
       }
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Erreur inconnue"); }
@@ -459,7 +459,7 @@ export default function PredictPage() {
             <div className="mt-4 flex gap-2">
               <button type="button" onClick={async () => {
                 try {
-                  const rec = await api.recommend(score, section, 12);
+                  const rec = await api.recommend(score, section, 10);
                   setRecommendations(rec);
                   setActiveTab("recommendations");
                   setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 120);
