@@ -112,6 +112,10 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001"
 ).split(",")
 
+# During local development allow all origins for convenience (override in production)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+
 # ---------- OpenRouter API ----------
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
