@@ -116,8 +116,10 @@ export default function PredictPage() {
     }
 
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    if (search.trim().length < 2) { setSearchResults([]); setShowDropdown(false); return; }
+    // start searching from 1 character to update results as the user types
+    if (search.trim().length < 1) { setSearchResults([]); setShowDropdown(false); return; }
     setLoadingSearch(true); setShowDropdown(true);
+    // reduce debounce for more responsive typing experience
     searchTimer.current = setTimeout(async () => {
       try {
         const q = search.trim();
@@ -147,13 +149,14 @@ export default function PredictPage() {
 
         const scored = data.map((d) => ({ d, score: scoreMatch(d) }));
         scored.sort((a, b) => b.score - a.score);
-        setSearchResults(scored.map((s) => s.d));
+        // limit client-side to top 50 results to avoid overwhelming the UI
+        setSearchResults(scored.slice(0, 50).map((s) => s.d));
         setHighlightedIndex(scored.length ? 0 : -1);
       } catch {
         setSearchResults([]);
         setHighlightedIndex(-1);
       } finally { setLoadingSearch(false); }
-    }, 250);
+    }, 100);
     return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
   }, [search]);
 
