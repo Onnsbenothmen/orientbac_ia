@@ -1,0 +1,77 @@
+{
+    "section_bac": "S",
+    "score": 130.0,
+    "total": 5,
+    "results": [
+        {
+            "filiere_code": "40161",
+            "filiere_nom": "Licence en Pr\u00c3\u00a9servation du Patrimoine Culturel",
+            "universite_nom": "Facult\u00c3\u00a9 des Lettres et des Sciences Humaines de Sfax",
+            "gouvernorat": "Universit\u00c3\u00a9 de Sfax",
+            "type_diplome": "Licence",
+            "score_min": 68.2,
+            "score_moyen": 68.2,
+            "score_max": 68.2,
+            "dernier_seuil": 68.2,
+            "marge": 61.8,
+            "probabilite_estimee": 0.92,
+            "niveau": "Tres favorable"
+        },
+        {
+            "filiere_code": "54546",
+            "filiere_nom": "Licence en Biotechnologie",
+            "universite_nom": "ISBAM - Institut Sup\u00c3\u00a9rieur de Biologie Appliqu\u00c3\u00a9e de M\u00c3\u00a9denine",
+            "gouvernorat": "Universit\u00c3\u00a9 de Gab\u00c3\u00a8s",
+            "type_diplome": "Licence",
+            "score_min": 72.02,
+            "score_moyen": 73.48,
+            "score_max": 75.08,
+            "dernier_seuil": 72.02,
+            "marge": 57.98,
+            "probabilite_estimee": 0.92,
+            "niveau": "Tres favorable"
+        },
+        {
+            "filiere_code": "51629",
+            "filiere_nom": "Licence en \u00c3\u2030lectronique, \u00c3\u2030lectrotechnique et Automatique",
+            "universite_nom": "ISSAT Gab\u00c3\u00a8s - Institut Sup\u00c3\u00a9rieur des Sciences Appliqu\u00c3\u00a9es et de Technologie de Gab\u00c3\u00a8s",
+            "gouvernorat": "Universit\u00c3\u00a9 de Gab\u00c3\u00a8s",
+            "type_diplome": "Licence",
+            "score_min": 72.21,
+            "score_moyen": 83.19,
+            "score_max": 89.39,
+            "dernier_seuil": 72.21,
+            "marge": 57.79,
+            "probabilite_estimee": 0.92,
+            "niveau": "Tres favorable"
+        },
+        {
+            "filiere_code": "70208",
+            "filiere_nom": "Licence en Design Produit",
+            "universite_nom": "Institut Sup\u00c3\u00a9rieur des Arts et M\u00c3\u00a9tiers de Kairouan",
+            "gouvernorat": "Universit\u00c3\u00a9 de Kairouan",
+            "type_diplome": "Licence",
+            "score_min": 72.51,
+            "score_moyen": 92.07,
+            "score_max": 99.43,
+            "dernier_seuil": 72.51,
+            "marge": 57.49,
+            "probabilite_estimee": 0.92,
+            "niveau": "Tres favorable"
+        },
+        {
+            "filiere_code": "40501",
+            "filiere_nom": "Licence en Chimie",
+            "universite_nom": "Facult\u00c3\u00a9 des Sciences de Sfax",
+            "gouvernorat": "Universit\u00c3\u00a9 de Sfax",
+            "type_diplome": "Licence",
+            "score_min": 73.11,
+            "score_moyen": 75.6,
+            "score_max": 78.45,
+            "dernier_seuil": 73.11,
+            "marge": 56.89,
+            "probabilite_estimee": 0.92,
+            "niveau": "Tres favorable"
+        }
+    ]
+}

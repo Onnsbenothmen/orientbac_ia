@@ -103,8 +103,7 @@ def dashboard_stats(request):
     total_scores = ScoreHistorique.objects.count()
     total_gouvernorats = Gouvernorat.objects.count()
 
-    # Detect CSV fallback mode: if "gouvernorat" values look like university names,
-    # we present this dimension as "université" in the dashboard.
+  
     gov_names = list(
         Gouvernorat.objects.values_list("nom", flat=True)[:30]
     )
@@ -113,7 +112,6 @@ def dashboard_stats(request):
     )
     zone_label = "université" if looks_like_universite_dimension else "gouvernorat"
 
-    # Score moyen par année
     scores_par_annee = (
         ScoreHistorique.objects
         .values("annee")
@@ -126,7 +124,6 @@ def dashboard_stats(request):
         .order_by("annee")
     )
 
-    # Score moyen par gouvernorat
     scores_par_gouvernorat = (
         ScoreHistorique.objects
         .values("filiere__universite__gouvernorat__nom")
@@ -137,7 +134,6 @@ def dashboard_stats(request):
         .order_by("-score_moyen")
     )
 
-    # Score moyen par section bac
     scores_par_section = (
         ScoreHistorique.objects
         .values("section_bac")
@@ -148,7 +144,6 @@ def dashboard_stats(request):
         .order_by("section_bac")
     )
 
-    # Top 10 filières les plus sélectives (dernier score le plus élevé)
     latest_year = ScoreHistorique.objects.order_by("-annee").values_list("annee", flat=True).first()
     top_filieres = []
     if latest_year:
@@ -164,7 +159,6 @@ def dashboard_stats(request):
             )
         )
 
-    # Évolution des scores pour une filière donnée (si filiere_id fourni)
     evolution = []
     filiere_id = request.query_params.get("filiere_id")
     if filiere_id:

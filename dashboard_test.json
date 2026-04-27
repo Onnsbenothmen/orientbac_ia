@@ -1,0 +1,214 @@
+{
+    "meta": {
+        "zone_label": "universit\u00c3\u00a9",
+        "score_scale": "reel"
+    },
+    "totaux": {
+        "gouvernorats": 12,
+        "universites": 188,
+        "filieres": 690,
+        "scores": 10638
+    },
+    "scores_par_annee": [
+        {
+            "annee": 2022,
+            "score_moyen": 114.50684865987165,
+            "score_min": 64.0064,
+            "score_max": 201.275,
+            "nb_filieres": 682
+        },
+        {
+            "annee": 2023,
+            "score_moyen": 116.99565454888636,
+            "score_min": 66.7368,
+            "score_max": 199.0361,
+            "nb_filieres": 682
+        },
+        {
+            "annee": 2024,
+            "score_moyen": 118.0077140430351,
+            "score_min": 65.8264,
+            "score_max": 199.73,
+            "nb_filieres": 682
+        },
+        {
+            "annee": 2025,
+            "score_moyen": 113.84239803047194,
+            "score_min": 61.0716,
+            "score_max": 221.3509,
+            "nb_filieres": 688
+        }
+    ],
+    "scores_par_gouvernorat": [
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Tunis El Manar",
+            "score_moyen": 133.28675757238307,
+            "nb_filieres": 63
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Monastir",
+            "score_moyen": 125.05560998781972,
+            "nb_filieres": 52
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Sousse",
+            "score_moyen": 124.65139042189283,
+            "nb_filieres": 52
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Tunis",
+            "score_moyen": 120.10569138461538,
+            "nb_filieres": 33
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Carthage",
+            "score_moyen": 119.54417308003234,
+            "nb_filieres": 80
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de La Manouba",
+            "score_moyen": 118.31242428355958,
+            "nb_filieres": 33
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Sfax",
+            "score_moyen": 115.51367451327434,
+            "nb_filieres": 76
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Gab\u00c3\u00a8s",
+            "score_moyen": 109.82244299339692,
+            "nb_filieres": 181
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Jendouba",
+            "score_moyen": 107.84780916844349,
+            "nb_filieres": 32
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 Ezzitouna",
+            "score_moyen": 103.94995949367089,
+            "nb_filieres": 4
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Gafsa",
+            "score_moyen": 99.5057228110599,
+            "nb_filieres": 39
+        },
+        {
+            "filiere__universite__gouvernorat__nom": "Universit\u00c3\u00a9 de Kairouan",
+            "score_moyen": 98.24229587155963,
+            "nb_filieres": 45
+        }
+    ],
+    "scores_par_section": [
+        {
+            "section_bac": "E",
+            "score_moyen": 101.26196714719272,
+            "nb_scores": 1318
+        },
+        {
+            "section_bac": "I",
+            "score_moyen": 116.4200921885087,
+            "nb_scores": 1549
+        },
+        {
+            "section_bac": "L",
+            "score_moyen": 105.37939502645503,
+            "nb_scores": 945
+        },
+        {
+            "section_bac": "M",
+            "score_moyen": 122.03100897363993,
+            "nb_scores": 1783
+        },
+        {
+            "section_bac": "S",
+            "score_moyen": 116.7885743018868,
+            "nb_scores": 2650
+        },
+        {
+            "section_bac": "SP",
+            "score_moyen": 140.10950234741784,
+            "nb_scores": 426
+        },
+        {
+            "section_bac": "T",
+            "score_moyen": 117.97827956278597,
+            "nb_scores": 1967
+        }
+    ],
+    "top_filieres_selectives": [
+        {
+            "filiere__code": "14318",
+            "filiere__nom": "Licence en Sciences de Gestion",
+            "filiere__universite__nom": "IHEC Carthage - Institut des Hautes \u00c3\u2030tudes Commerciales de Carthage",
+            "score_dernier_admis": 221.3509,
+            "section_bac": "T"
+        },
+        {
+            "filiere__code": "41797",
+            "filiere__nom": "Licence en Sciences Infirmi\u00c3\u00a8res (Hommes)",
+            "filiere__universite__nom": "Institut Sup\u00c3\u00a9rieur des Sciences Infirmi\u00c3\u00a8res de Sfax",
+            "score_dernier_admis": 199.3517,
+            "section_bac": "SP"
+        },
+        {
+            "filiere__code": "30700",
+            "filiere__nom": "M\u00c3\u00a9decine",
+            "filiere__universite__nom": "Facult\u00c3\u00a9 de M\u00c3\u00a9decine de Sousse",
+            "score_dernier_admis": 197.32,
+            "section_bac": "SP"
+        },
+        {
+            "filiere__code": "30700",
+            "filiere__nom": "M\u00c3\u00a9decine",
+            "filiere__universite__nom": "Facult\u00c3\u00a9 de M\u00c3\u00a9decine de Sousse",
+            "score_dernier_admis": 195.845,
+            "section_bac": "M"
+        },
+        {
+            "filiere__code": "34744",
+            "filiere__nom": "Licence en Physioth\u00c3\u00a9rapie",
+            "filiere__universite__nom": "ESSTSS - \u00c3\u2030cole Sup\u00c3\u00a9rieure des Sciences et Techniques de la Sant\u00c3\u00a9 de Monastir",
+            "score_dernier_admis": 195.0289,
+            "section_bac": "SP"
+        },
+        {
+            "filiere__code": "34700",
+            "filiere__nom": "M\u00c3\u00a9decine",
+            "filiere__universite__nom": "Facult\u00c3\u00a9 de M\u00c3\u00a9decine de Monastir",
+            "score_dernier_admis": 194.12,
+            "section_bac": "SP"
+        },
+        {
+            "filiere__code": "11523",
+            "filiere__nom": "Licence en Sciences Informatiques",
+            "filiere__universite__nom": "ISI - Institut Sup\u00c3\u00a9rieur d'Informatique",
+            "score_dernier_admis": 192.5519,
+            "section_bac": "I"
+        },
+        {
+            "filiere__code": "34702",
+            "filiere__nom": "M\u00c3\u00a9decine Dentaire",
+            "filiere__universite__nom": "Facult\u00c3\u00a9 de M\u00c3\u00a9decine Dentaire de Monastir",
+            "score_dernier_admis": 192.275,
+            "section_bac": "SP"
+        },
+        {
+            "filiere__code": "10520",
+            "filiere__nom": "Cycle Pr\u00c3\u00a9paratoire Int\u00c3\u00a9gr\u00c3\u00a9 : Maths-Physique-Informatique",
+            "filiere__universite__nom": "INSAT - Institut National des Sciences Appliqu\u00c3\u00a9es et de Technologie",
+            "score_dernier_admis": 192.1783,
+            "section_bac": "I"
+        },
+        {
+            "filiere__code": "34700",
+            "filiere__nom": "M\u00c3\u00a9decine",
+            "filiere__universite__nom": "Facult\u00c3\u00a9 de M\u00c3\u00a9decine de Monastir",
+            "score_dernier_admis": 190.98,
+            "section_bac": "M"
+        }
+    ],
+    "evolution_filiere": []
+}

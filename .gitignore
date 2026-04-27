@@ -1,0 +1,45 @@
+# Byte-compiled / cached
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+
+# Django
+*.sqlite3
+staticfiles/
+media/
+
+# ML model (large binary)
+backend/orientation/ml/*.joblib
+
+# Node
+node_modules/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+pgdata/
+
+# Misc
+*.log
+
+# Next.js local dev cache
+frontend/.next-dev/
