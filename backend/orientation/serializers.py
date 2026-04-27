@@ -1,6 +1,18 @@
 """Serializers for the orientation API."""
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from .models import Gouvernorat, Universite, Filiere, ScoreHistorique
+from .models import (
+    AdminProfile,
+    Filiere,
+    Gouvernorat,
+    ScoreHistorique,
+    SectionBac,
+    StudentProfile,
+    Universite,
+    UserRole,
+)
 
 
 class GouvernoratSerializer(serializers.ModelSerializer):
@@ -114,3 +126,99 @@ class ChatMessageSerializer(serializers.Serializer):
         default="short",
         help_text="Contrôle la longueur de la réponse: 'short' (1-2 phrases) ou 'detailed' (plus complète) ou 'full' (non tronquée).",
     )
+
+
+class SignUpSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(min_length=8, write_only=True)
+    password_confirm = serializers.CharField(min_length=8, write_only=True)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Ce nom d'utilisateur existe deja.")
+        return value
+
+    def validate_email(self, value):
+        if value and User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Cet email existe deja.")
+        return value
+
+    def validate(self, attrs):
+        if attrs.get("password") != attrs.get("password_confirm"):
+            raise serializers.ValidationError({"password_confirm": "Les mots de passe ne correspondent pas."})
+        try:
+            validate_password(attrs.get("password", ""))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)})
+        return attrs
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(min_length=8, write_only=True)
+    new_password_confirm = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, attrs):
+        if attrs.get("new_password") != attrs.get("new_password_confirm"):
+            raise serializers.ValidationError({"new_password_confirm": "Les mots de passe ne correspondent pas."})
+        try:
+            validate_password(attrs.get("new_password", ""))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"new_password": list(exc.messages)})
+        return attrs
+
+
+class ProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(read_only=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    role = serializers.ChoiceField(choices=UserRole.choices, read_only=True)
+    niveau_etude = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    section_bac = serializers.CharField(max_length=3, required=False, allow_blank=True)
+    departement = serializers.CharField(max_length=120, required=False, allow_blank=True)
+
+
+class AuthResponseSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    user = ProfileSerializer()
+
+
+def serialize_user_profile(user: User) -> dict:
+    role = UserRole.ADMIN if hasattr(user, "admin_profile") else UserRole.ETUDIANT
+    payload = {
+        "username": user.username,
+        "email": user.email or "",
+        "first_name": user.first_name or "",
+        "last_name": user.last_name or "",
+        "role": role,
+        "niveau_etude": "",
+        "section_bac": "",
+        "departement": "",
+    }
+    if hasattr(user, "student_profile"):
+        payload["niveau_etude"] = user.student_profile.niveau_etude
+        payload["section_bac"] = user.student_profile.section_bac
+    if hasattr(user, "admin_profile"):
+        payload["departement"] = user.admin_profile.departement
+    return payload
+
+
+def ensure_profile_for_role(user: User, role: str) -> None:
+    if role == UserRole.ADMIN:
+        AdminProfile.objects.get_or_create(user=user, defaults={"role": UserRole.ADMIN})
+        StudentProfile.objects.filter(user=user).delete()
+        user.is_staff = True
+    else:
+        StudentProfile.objects.get_or_create(user=user, defaults={"role": UserRole.ETUDIANT})
+        AdminProfile.objects.filter(user=user).delete()
+        user.is_staff = False
+    user.save(update_fields=["is_staff"])

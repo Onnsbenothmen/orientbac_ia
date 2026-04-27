@@ -93,6 +93,12 @@ npm run dev
 | GET     | `/api/scores/`          | Scores historiques                   |
 | GET     | `/api/stats/dashboard/` | Statistiques agrégées (Dashboard BI) |
 | POST    | `/api/predict/`         | Prédiction d'admission (XGBoost)     |
+| POST    | `/api/auth/signup/`     | Inscription étudiant                 |
+| POST    | `/api/auth/login/`      | Connexion (username ou email)        |
+| POST    | `/api/auth/logout/`     | Déconnexion (invalide token)         |
+| GET     | `/api/auth/profile/`    | Lire le profil connecté              |
+| PATCH   | `/api/auth/profile/`    | Mettre à jour le profil              |
+| POST    | `/api/auth/change-password/` | Changer mot de passe             |
 | POST    | `/api/chat/`            | Chatbot IA (OpenRouter)              |
 
 ### Exemple — Prédiction

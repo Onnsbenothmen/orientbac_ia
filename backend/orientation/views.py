@@ -12,8 +12,13 @@ Endpoints :
   POST /api/chat/
 """
 import time
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Avg, Min, Max, Count, Q
 
@@ -28,7 +33,14 @@ from .serializers import (
     RecommendationInputSerializer,
     RecommendationItemSerializer,
     ChatMessageSerializer,
+    SignUpSerializer,
+    LoginSerializer,
+    ChangePasswordSerializer,
+    ProfileSerializer,
+    ensure_profile_for_role,
+    serialize_user_profile,
 )
+from .models import UserRole
 from .services.prediction import predict_admission
 from .services.chatbot import chat_with_bot
 
@@ -88,6 +100,155 @@ class ScoreHistoriqueViewSet(viewsets.ReadOnlyModelViewSet):
         if section:
             qs = qs.filter(section_bac=section)
         return qs
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def signup_view(request):
+    """
+    POST /api/auth/signup/
+    Body: { "username": "x", "password": "..." }
+    """
+    serializer = SignUpSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    data = serializer.validated_data
+    user_model = get_user_model()
+    user = user_model.objects.create_user(
+        username=data["username"],
+        email=data.get("email", ""),
+        password=data["password"],
+        first_name=data.get("first_name", ""),
+        last_name=data.get("last_name", ""),
+    )
+
+    # Inscription publique: role etudiant uniquement.
+    ensure_profile_for_role(user, UserRole.ETUDIANT)
+    token, _ = Token.objects.get_or_create(user=user)
+
+    return Response({"token": token.key, "user": serialize_user_profile(user)}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_view(request):
+    """
+    POST /api/auth/login/
+    Body: { "username": "x", "password": "..." }
+    """
+    serializer = LoginSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    login_value = serializer.validated_data["username"].strip()
+    password_value = serializer.validated_data["password"]
+
+    username_for_auth = login_value
+    if "@" in login_value:
+        user_model = get_user_model()
+        user_obj = user_model.objects.filter(email__iexact=login_value).first()
+        if user_obj:
+            username_for_auth = user_obj.get_username()
+
+    user = authenticate(
+        username=username_for_auth,
+        password=password_value,
+    )
+    if not user:
+        return Response({"error": "Identifiants invalides."}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not hasattr(user, "student_profile") and not hasattr(user, "admin_profile"):
+        ensure_profile_for_role(user, UserRole.ADMIN if user.is_staff else UserRole.ETUDIANT)
+
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({"token": token.key, "user": serialize_user_profile(user)})
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    """
+    POST /api/auth/logout/
+    Invalide le token courant.
+    """
+    token = getattr(request, "auth", None)
+    if token:
+        token.delete()
+    return Response({"message": "Deconnecte avec succes."})
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    """
+    POST /api/auth/change-password/
+    Body: { "old_password": "...", "new_password": "...", "new_password_confirm": "..." }
+    """
+    serializer = ChangePasswordSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    user = request.user
+    if not user.check_password(serializer.validated_data["old_password"]):
+        return Response({"error": "Ancien mot de passe incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.set_password(serializer.validated_data["new_password"])
+    user.save(update_fields=["password"])
+
+    # Invalide tous les anciens tokens pour forcer une reconnexion propre.
+    Token.objects.filter(user=user).delete()
+    new_token = Token.objects.create(user=user)
+    return Response({"message": "Mot de passe mis a jour.", "token": new_token.key})
+
+
+@api_view(["GET", "PATCH"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def profile_view(request):
+    """
+    GET/PATCH /api/auth/profile/
+    """
+    user = request.user
+    if not hasattr(user, "student_profile") and not hasattr(user, "admin_profile"):
+        ensure_profile_for_role(user, UserRole.ADMIN if user.is_staff else UserRole.ETUDIANT)
+
+    if request.method == "GET":
+        return Response(serialize_user_profile(user))
+
+    serializer = ProfileSerializer(data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    payload = serializer.validated_data
+    role = UserRole.ADMIN if hasattr(user, "admin_profile") else UserRole.ETUDIANT
+
+    if "email" in payload:
+        user.email = payload.get("email", "")
+    if "first_name" in payload:
+        user.first_name = payload.get("first_name", "")
+    if "last_name" in payload:
+        user.last_name = payload.get("last_name", "")
+    user.save(update_fields=["email", "first_name", "last_name", "is_staff"])
+
+    if role == UserRole.ADMIN and hasattr(user, "admin_profile"):
+        if "departement" in payload:
+            user.admin_profile.departement = payload.get("departement", "")
+            user.admin_profile.save(update_fields=["departement"])
+    elif role == UserRole.ETUDIANT and hasattr(user, "student_profile"):
+        to_update = []
+        if "niveau_etude" in payload:
+            user.student_profile.niveau_etude = payload.get("niveau_etude", "")
+            to_update.append("niveau_etude")
+        if "section_bac" in payload:
+            user.student_profile.section_bac = payload.get("section_bac", "")
+            to_update.append("section_bac")
+        if to_update:
+            user.student_profile.save(update_fields=to_update)
+
+    return Response(serialize_user_profile(user))
 
 
 # ── Dashboard Statistics ──────────────────────────────────────────────

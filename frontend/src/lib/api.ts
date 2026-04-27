@@ -4,14 +4,64 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const AUTH_TOKEN_KEY = "edustat_auth_token";
+
+function getAuthToken(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(AUTH_TOKEN_KEY) || "";
+}
+
+function setAuthToken(token: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+function clearAuthToken() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getAuthToken();
+  const headers = new Headers(options?.headers || {});
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token) {
+    headers.set("Authorization", `Token ${token}`);
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...options?.headers },
     ...options,
+    headers,
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `API error ${res.status}`);
+    const body = await res.json().catch(() => ({} as Record<string, unknown>));
+
+    if (typeof body.error === "string" && body.error.trim()) {
+      throw new Error(body.error);
+    }
+
+    if (body && typeof body === "object") {
+      const details = Object.entries(body as Record<string, unknown>)
+        .map(([field, value]) => {
+          if (Array.isArray(value)) {
+            return `${field}: ${value.join(", ")}`;
+          }
+          if (typeof value === "string") {
+            return `${field}: ${value}`;
+          }
+          return "";
+        })
+        .filter(Boolean)
+        .join(" | ");
+
+      if (details) {
+        throw new Error(details);
+      }
+    }
+
+    throw new Error(`API error ${res.status}`);
   }
   return res.json();
 }
@@ -91,6 +141,27 @@ export interface ChatResponse {
   usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
+export interface AuthUser {
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: "admin" | "etudiant";
+  niveau_etude: string;
+  section_bac: string;
+  departement: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
+  token: string;
+}
+
 export interface FiliereItem {
   id: number;
   code: string;
@@ -146,4 +217,62 @@ export const api = {
       `/api/filieres/${params ? `?${params}` : ""}`
     ).then((r) => r.results),
   getFiliereHistory: (code: string) => apiFetch<{ annee: number; section_bac: string; score_dernier_admis: number }[]>(`/api/filieres/${encodeURIComponent(code)}/history/`),
+
+  signUp: (payload: {
+    username: string;
+    email?: string;
+    password: string;
+    password_confirm: string;
+    first_name?: string;
+    last_name?: string;
+  }) =>
+    apiFetch<AuthResponse>("/api/auth/signup/", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).then((res) => {
+      setAuthToken(res.token);
+      return res;
+    }),
+
+  login: (username: string, password: string) =>
+    apiFetch<AuthResponse>("/api/auth/login/", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }).then((res) => {
+      setAuthToken(res.token);
+      return res;
+    }),
+
+  getProfile: () => apiFetch<AuthUser>("/api/auth/profile/"),
+
+  updateProfile: (payload: Partial<AuthUser>) =>
+    apiFetch<AuthUser>("/api/auth/profile/", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+
+  logout: async () => {
+    try {
+      await apiFetch<{ message: string }>("/api/auth/logout/", { method: "POST" });
+    } catch {
+      // On nettoie localement meme si le backend est deja deconnecte.
+    } finally {
+      clearAuthToken();
+    }
+  },
+
+  changePassword: (oldPassword: string, newPassword: string, newPasswordConfirm: string) =>
+    apiFetch<ChangePasswordResponse>("/api/auth/change-password/", {
+      method: "POST",
+      body: JSON.stringify({
+        old_password: oldPassword,
+        new_password: newPassword,
+        new_password_confirm: newPasswordConfirm,
+      }),
+    }).then((res) => {
+      setAuthToken(res.token);
+      return res;
+    }),
+
+  getStoredToken: () => getAuthToken(),
 };

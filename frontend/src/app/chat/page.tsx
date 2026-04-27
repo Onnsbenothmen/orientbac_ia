@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 
 interface Message {
@@ -9,6 +10,7 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -22,6 +24,13 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [verbosity, setVerbosity] = useState<"short" | "detailed" | "full">("short");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!api.getStoredToken()) {
+      router.replace("/login");
+      return;
+    }
+  }, [router]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

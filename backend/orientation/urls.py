@@ -11,6 +11,11 @@ router.register(r"scores", views.ScoreHistoriqueViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("auth/signup/", views.signup_view, name="auth-signup"),
+    path("auth/login/", views.login_view, name="auth-login"),
+    path("auth/logout/", views.logout_view, name="auth-logout"),
+    path("auth/profile/", views.profile_view, name="auth-profile"),
+    path("auth/change-password/", views.change_password_view, name="auth-change-password"),
     path("stats/dashboard/", views.dashboard_stats, name="dashboard-stats"),
     path("predict/", views.prediction_view, name="predict"),
     path("recommendations/", views.recommendations_view, name="recommendations"),

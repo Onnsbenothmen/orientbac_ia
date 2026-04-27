@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api, DashboardStats } from "@/lib/api";
 import StatsCards from "@/components/StatsCards";
 import ScoresByYearChart from "@/components/ScoresByYearChart";
@@ -9,17 +10,24 @@ import ScoresBySectionChart from "@/components/ScoresBySectionChart";
 import TopFilieresTable from "@/components/TopFilieresTable";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!api.getStoredToken()) {
+      router.replace("/login");
+      setLoading(false);
+      return;
+    }
+
     api
       .getDashboard()
       .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   if (loading)
     return (

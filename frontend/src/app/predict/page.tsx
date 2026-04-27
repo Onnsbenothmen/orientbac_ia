@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api, FiliereItem, PredictionResult, RecommendationResponse } from "@/lib/api";
 
 const SECTIONS = [
@@ -28,7 +29,7 @@ function niveauFromProba(p: number): Niveau {
 
 function colorClasses(n: string | Niveau) {
   // normalize accents and case so backend values like "Tres favorable" still match
-  const norm = String(n || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  const norm = String(n || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   if (norm.includes('tres') || norm.includes('tres favorable') || norm.includes('tresfavor')) {
     return { bg: 'bg-[#3B6D11]', bgLight: 'bg-[#E8F5D6]', border: 'border-[#3B6D11]', text: 'text-[#3B6D11]', textDark: 'text-[#2A4F0C]' };
   }
@@ -77,6 +78,7 @@ function SkeletonList() {
 }
 
 export default function PredictPage() {
+  const router = useRouter();
   const [score, setScore] = useState<number>(145);
   const [section, setSection] = useState<string>("M");
   
@@ -98,6 +100,12 @@ export default function PredictPage() {
 
   const searchRef = useRef<HTMLDivElement>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!api.getStoredToken()) {
+      router.replace("/login");
+    }
+  }, [router]);
 
   useEffect(() => {
     // Load saved profile from localStorage (filiere, score, section)
@@ -126,10 +134,10 @@ export default function PredictPage() {
         const data = await api.getFilieres(`search=${encodeURIComponent(q)}`);
 
         // Lightweight client-side scoring to improve ordering and fuzzy matches
-        const normalize = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+        const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
         const qnorm = normalize(q);
 
-        function scoreMatch(item: FiliereItem) {
+        const scoreMatch = (item: FiliereItem) => {
           const name = normalize(item.nom || "");
           const code = String(item.code || "").toLowerCase();
           if (code === qnorm) return 100; // exact code
@@ -145,7 +153,7 @@ export default function PredictPage() {
           // slight preference to shorter distance
           score -= Math.max(0, name.length - qnorm.length) * 0.01;
           return score;
-        }
+        };
 
         const scored = data.map((d) => ({ d, score: scoreMatch(d) }));
         scored.sort((a, b) => b.score - a.score);

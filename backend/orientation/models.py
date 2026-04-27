@@ -3,6 +3,7 @@ Modèles de données — EduStat-TN
 Orientation universitaire tunisienne
 """
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Gouvernorat(models.Model):
@@ -126,3 +127,35 @@ class ScoreHistorique(models.Model):
             f"{self.filiere.code} | {self.annee} | "
             f"{self.get_section_bac_display()} → {self.score_dernier_admis}"
         )
+
+
+class UserRole(models.TextChoices):
+    ADMIN = "admin", "Admin"
+    ETUDIANT = "etudiant", "Etudiant"
+
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student_profile")
+    role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.ETUDIANT)
+    niveau_etude = models.CharField(max_length=100, blank=True, default="")
+    section_bac = models.CharField(max_length=3, blank=True, default="")
+
+    class Meta:
+        verbose_name = "Profil etudiant"
+        verbose_name_plural = "Profils etudiant"
+
+    def __str__(self):
+        return f"Etudiant: {self.user.username}"
+
+
+class AdminProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin_profile")
+    role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.ADMIN)
+    departement = models.CharField(max_length=120, blank=True, default="")
+
+    class Meta:
+        verbose_name = "Profil admin"
+        verbose_name_plural = "Profils admin"
+
+    def __str__(self):
+        return f"Admin: {self.user.username}"

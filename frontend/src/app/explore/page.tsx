@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 interface Filiere {
   id: number;
@@ -16,6 +18,7 @@ interface Filiere {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ExplorePage() {
+  const router = useRouter();
   const [filieres, setFilieres] = useState<Filiere[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,8 +44,12 @@ export default function ExplorePage() {
 
   // Fetch when page changes (pagination)
   useEffect(() => {
+    if (!api.getStoredToken()) {
+      router.replace("/login");
+      return;
+    }
     fetchFilieres(search, page);
-  }, [page]);
+  }, [page, router]);
 
   // Real-time search with debounce and minimum characters
   const debounceRef = useRef<number | null>(null);
