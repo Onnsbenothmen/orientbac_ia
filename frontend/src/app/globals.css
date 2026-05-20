@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,10 +13,12 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
+    "Space Grotesk",
     sans-serif;
+}
+
+.font-display {
+  font-family: "Fraunces", "Space Grotesk", serif;
 }
 
 /* Custom scrollbar */

@@ -44,8 +44,8 @@ export default function AppNavbar() {
               <a href="/predict" className="hover:text-primary-600 transition">Prediction</a>
               <a href="/chat" className="hover:text-primary-600 transition">Chatbot</a>
               {isAdmin ? (
-                <a href="http://localhost:8000/admin/" className="hover:text-primary-600 transition" target="_blank" rel="noreferrer">
-                  Admin Panel
+                <a href="/admin" className="hover:text-primary-600 transition">
+                  Admin
                 </a>
               ) : (
                 <a href="/profile" className="hover:text-primary-600 transition">Espace etudiant</a>
